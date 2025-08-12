@@ -36,21 +36,24 @@
         </tr>
         {% for i, t in enumerate(tarefas) %}
         <tr>
-            <td>{{ t.atividade }}</td>
-            <td class="status-{{ t.status|lower }}">{{ t.status }}</td>
-            <td>
-                <form action="/update/{{ i }}" method="POST">
-                    <select name="status">
-                        <option value="Pendente">Pendente</option>
-                        <option value="Iniciado">Iniciado</option>
-                        <option value="Completo">Completo</option>
-                    </select>
-                    <button type="submit">Atualizar</button>
-                </form>
-                <a href="/delete/{{ i }}">Excluir</a>
-            </td>
-        </tr>
-        {% endfor %}
+           {% for t in tarefas %}
+<tr>
+    <td>{{ t.atividade }}</td>
+    <td class="status-{{ t.status|lower }}">{{ t.status }}</td>
+    <td>
+        <form action="/update/{{ loop.index0 }}" method="POST">
+            <select name="status">
+                <option value="Pendente">Pendente</option>
+                <option value="Iniciado">Iniciado</option>
+                <option value="Completo">Completo</option>
+            </select>
+            <button type="submit">Atualizar</button>
+        </form>
+        <a href="/delete/{{ loop.index0 }}">Excluir</a>
+    </td>
+</tr>
+{% endfor %}
+
     </table>
 </body>
 </html>
