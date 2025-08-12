@@ -1,6 +1,10 @@
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 
+@app.before_first_request
+def cria_tabelas():
+    db.create_all()
+
 app = Flask(__name__)
 app.secret_key = "chave-secreta-para-sessao"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tarefas.db"
