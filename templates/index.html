@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Tarefas</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        table, th, td { border: 1px solid #ccc; }
+        th, td { padding: 10px; text-align: left; }
+        form { display: inline; }
+        .status-pendente { color: red; }
+        .status-iniciado { color: orange; }
+        .status-completo { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Gerenciador de Tarefas</h1>
+
+    <form action="/add" method="POST">
+        <input type="text" name="atividade" placeholder="Digite a atividade" required>
+        <select name="status">
+            <option value="Pendente">Pendente</option>
+            <option value="Iniciado">Iniciado</option>
+            <option value="Completo">Completo</option>
+        </select>
+        <button type="submit">Adicionar</button>
+    </form>
+
+    <table>
+        <tr>
+            <th>Atividade</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+        {% for i, t in enumerate(tarefas) %}
+        <tr>
+            <td>{{ t.atividade }}</td>
+            <td class="status-{{ t.status|lower }}">{{ t.status }}</td>
+            <td>
+                <form action="/update/{{ i }}" method="POST">
+                    <select name="status">
+                        <option value="Pendente">Pendente</option>
+                        <option value="Iniciado">Iniciado</option>
+                        <option value="Completo">Completo</option>
+                    </select>
+                    <button type="submit">Atualizar</button>
+                </form>
+                <a href="/delete/{{ i }}">Excluir</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
