@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Gerenciador de Tarefas</title>
     <style>
-        /* Reset básico */
-        * {
-            box-sizing: border-box;
-        }
+        /* Estilos minimalistas (igual da versão anterior) */
+        * { box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
                 Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
@@ -21,10 +19,7 @@
             align-items: center;
             min-height: 100vh;
         }
-        h1 {
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-        }
+        h1 { font-weight: 600; margin-bottom: 1.5rem; }
         form {
             display: flex;
             gap: 0.75rem;
@@ -32,28 +27,13 @@
             width: 100%;
             max-width: 480px;
         }
-        input[type="text"] {
-            flex: 1;
+        input[type="text"], select {
             padding: 0.5rem 0.75rem;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 1rem;
-            outline-offset: 2px;
-            transition: border-color 0.2s ease;
         }
-        input[type="text"]:focus {
-            border-color: #0078d7;
-        }
-        select {
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1rem;
-            background: white;
-            cursor: pointer;
-            transition: border-color 0.2s ease;
-        }
-        select:focus {
+        input[type="text"]:focus, select:focus {
             border-color: #0078d7;
             outline: none;
         }
@@ -71,7 +51,6 @@
         button:hover {
             background-color: #005fa3;
         }
-
         table {
             width: 100%;
             max-width: 480px;
@@ -93,32 +72,15 @@
             background-color: #f4f4f4;
             font-weight: 600;
         }
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* Status colors */
-        .status-pendente {
-            color: #d9534f; /* vermelho */
-            font-weight: 600;
-        }
-        .status-iniciado {
-            color: #f0ad4e; /* laranja */
-            font-weight: 600;
-        }
-        .status-completo {
-            color: #5cb85c; /* verde */
-            font-weight: 600;
-        }
-
-        /* Form de update inline */
+        tr:last-child td { border-bottom: none; }
+        .status-pendente { color: #d9534f; font-weight: 600; }
+        .status-iniciado { color: #f0ad4e; font-weight: 600; }
+        .status-completo { color: #5cb85c; font-weight: 600; }
         td form {
             display: inline-block;
             margin-right: 0.75rem;
         }
-        td form select {
-            width: 110px;
-        }
+        td form select { width: 110px; }
         td form button {
             padding: 0.3rem 0.6rem;
             font-size: 0.85rem;
@@ -130,19 +92,12 @@
             text-decoration: none;
             cursor: pointer;
             transition: color 0.2s ease;
+            margin-left: 8px;
         }
-        td a:hover {
-            color: #d9534f;
-        }
-
-        /* Responsividade */
+        td a:hover { color: #d9534f; }
         @media (max-width: 520px) {
-            form, table {
-                max-width: 100%;
-            }
-            td form select {
-                width: 90px;
-            }
+            form, table { max-width: 100%; }
+            td form select { width: 90px; }
         }
     </style>
 </head>
@@ -151,7 +106,7 @@
 
     <form action="/add" method="POST">
         <input type="text" name="atividade" placeholder="Digite a atividade" required />
-        <select name="status">
+        <select name="status" aria-label="Status da tarefa">
             <option value="Pendente">Pendente</option>
             <option value="Iniciado">Iniciado</option>
             <option value="Completo">Completo</option>
@@ -159,42 +114,30 @@
         <button type="submit">Adicionar</button>
     </form>
 
-    {% set pendentes = [] %}
-    {% set iniciadas = [] %}
-    {% set completas = [] %}
-
-    {% for i, t in tarefas %}
-        {% if t.status == 'Pendente' %}
-            {% do pendentes.append((i,t)) %}
-        {% elif t.status == 'Iniciado' %}
-            {% do iniciadas.append((i,t)) %}
-        {% elif t.status == 'Completo' %}
-            {% do completas.append((i,t)) %}
-        {% endif %}
-    {% endfor %}
-
     <h2>Pendentes</h2>
     <table>
         <thead><tr><th>Atividade</th><th>Ações</th></tr></thead>
         <tbody>
-            {% for i, t in pendentes %}
-            <tr>
-                <td>{{ t.atividade }}</td>
-                <td>
-                    <form action="/update/{{ i }}" method="POST" style="display:inline">
-                        <select name="status" aria-label="Alterar status">
-                            <option value="Pendente" {% if t.status == "Pendente" %}selected{% endif %}>Pendente</option>
-                            <option value="Iniciado" {% if t.status == "Iniciado" %}selected{% endif %}>Iniciado</option>
-                            <option value="Completo" {% if t.status == "Completo" %}selected{% endif %}>Completo</option>
-                        </select>
-                        <button type="submit">Ok</button>
-                    </form>
-                    <a href="/delete/{{ i }}" aria-label="Excluir tarefa" style="color:#d9534f; margin-left: 8px;">Excluir</a>
-                </td>
-            </tr>
+            {% if pendentes %}
+                {% for i, t in pendentes %}
+                <tr>
+                    <td>{{ t.atividade }}</td>
+                    <td>
+                        <form action="/update/{{ i }}" method="POST" style="display:inline">
+                            <select name="status" aria-label="Alterar status">
+                                <option value="Pendente" {% if t.status == "Pendente" %}selected{% endif %}>Pendente</option>
+                                <option value="Iniciado" {% if t.status == "Iniciado" %}selected{% endif %}>Iniciado</option>
+                                <option value="Completo" {% if t.status == "Completo" %}selected{% endif %}>Completo</option>
+                            </select>
+                            <button type="submit">Ok</button>
+                        </form>
+                        <a href="/delete/{{ i }}" aria-label="Excluir tarefa">Excluir</a>
+                    </td>
+                </tr>
+                {% endfor %}
             {% else %}
-            <tr><td colspan="2">Nenhuma tarefa pendente.</td></tr>
-            {% endfor %}
+                <tr><td colspan="2">Nenhuma tarefa pendente.</td></tr>
+            {% endif %}
         </tbody>
     </table>
 
@@ -202,24 +145,26 @@
     <table>
         <thead><tr><th>Atividade</th><th>Ações</th></tr></thead>
         <tbody>
-            {% for i, t in iniciadas %}
-            <tr>
-                <td>{{ t.atividade }}</td>
-                <td>
-                    <form action="/update/{{ i }}" method="POST" style="display:inline">
-                        <select name="status" aria-label="Alterar status">
-                            <option value="Pendente" {% if t.status == "Pendente" %}selected{% endif %}>Pendente</option>
-                            <option value="Iniciado" {% if t.status == "Iniciado" %}selected{% endif %}>Iniciado</option>
-                            <option value="Completo" {% if t.status == "Completo" %}selected{% endif %}>Completo</option>
-                        </select>
-                        <button type="submit">Ok</button>
-                    </form>
-                    <a href="/delete/{{ i }}" aria-label="Excluir tarefa" style="color:#d9534f; margin-left: 8px;">Excluir</a>
-                </td>
-            </tr>
+            {% if iniciadas %}
+                {% for i, t in iniciadas %}
+                <tr>
+                    <td>{{ t.atividade }}</td>
+                    <td>
+                        <form action="/update/{{ i }}" method="POST" style="display:inline">
+                            <select name="status" aria-label="Alterar status">
+                                <option value="Pendente" {% if t.status == "Pendente" %}selected{% endif %}>Pendente</option>
+                                <option value="Iniciado" {% if t.status == "Iniciado" %}selected{% endif %}>Iniciado</option>
+                                <option value="Completo" {% if t.status == "Completo" %}selected{% endif %}>Completo</option>
+                            </select>
+                            <button type="submit">Ok</button>
+                        </form>
+                        <a href="/delete/{{ i }}" aria-label="Excluir tarefa">Excluir</a>
+                    </td>
+                </tr>
+                {% endfor %}
             {% else %}
-            <tr><td colspan="2">Nenhuma tarefa iniciada.</td></tr>
-            {% endfor %}
+                <tr><td colspan="2">Nenhuma tarefa iniciada.</td></tr>
+            {% endif %}
         </tbody>
     </table>
 
@@ -227,25 +172,29 @@
     <table>
         <thead><tr><th>Atividade</th><th>Ações</th></tr></thead>
         <tbody>
-            {% for i, t in completas %}
-            <tr>
-                <td>{{ t.atividade }}</td>
-                <td>
-                    <form action="/update/{{ i }}" method="POST" style="display:inline">
-                        <select name="status" aria-label="Alterar status">
-                            <option value="Pendente" {% if t.status == "Pendente" %}selected{% endif %}>Pendente</option>
-                            <option value="Iniciado" {% if t.status == "Iniciado" %}selected{% endif %}>Iniciado</option>
-                            <option value="Completo" {% if t.status == "Completo" %}selected{% endif %}>Completo</option>
-                        </select>
-                        <button type="submit">Ok</button>
-                    </form>
-                    <a href="/delete/{{ i }}" aria-label="Excluir tarefa" style="color:#d9534f; margin-left: 8px;">Excluir</a>
-                </td>
-            </tr>
+            {% if completas %}
+                {% for i, t in completas %}
+                <tr>
+                    <td>{{ t.atividade }}</td>
+                    <td>
+                        <form action="/update/{{ i }}" method="POST" style="display:inline">
+                            <select name="status" aria-label="Alterar status">
+                                <option value="Pendente" {% if t.status == "Pendente" %}selected{% endif %}>Pendente</option>
+                                <option value="Iniciado" {% if t.status == "Iniciado" %}selected{% endif %}>Iniciado</option>
+                                <option value="Completo" {% if t.status == "Completo" %}selected{% endif %}>Completo</option>
+                            </select>
+                            <button type="submit">Ok</button>
+                        </form>
+                        <a href="/delete/{{ i }}" aria-label="Excluir tarefa">Excluir</a>
+                    </td>
+                </tr>
+                {% endfor %}
             {% else %}
-            <tr><td colspan="2">Nenhuma tarefa completa.</td></tr>
-            {% endfor %}
+                <tr><td colspan="2">Nenhuma tarefa completa.</td></tr>
+            {% endif %}
         </tbody>
     </table>
+
 </body>
 </html>
+
