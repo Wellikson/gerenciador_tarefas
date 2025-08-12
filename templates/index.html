@@ -80,6 +80,7 @@
             background: white;
             border-radius: 6px;
             overflow: hidden;
+            margin-bottom: 2.5rem;
         }
         th, td {
             padding: 0.75rem 1rem;
@@ -158,31 +159,91 @@
         <button type="submit">Adicionar</button>
     </form>
 
+    {% set pendentes = [] %}
+    {% set iniciadas = [] %}
+    {% set completas = [] %}
+
+    {% for i, t in tarefas %}
+        {% if t.status == 'Pendente' %}
+            {% do pendentes.append((i,t)) %}
+        {% elif t.status == 'Iniciado' %}
+            {% do iniciadas.append((i,t)) %}
+        {% elif t.status == 'Completo' %}
+            {% do completas.append((i,t)) %}
+        {% endif %}
+    {% endfor %}
+
+    <h2>Pendentes</h2>
     <table>
-        <thead>
-            <tr>
-                <th>Atividade</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
+        <thead><tr><th>Atividade</th><th>Ações</th></tr></thead>
         <tbody>
-            {% for t in tarefas %}
+            {% for i, t in pendentes %}
             <tr>
                 <td>{{ t.atividade }}</td>
-                <td class="status-{{ t.status|lower }}">{{ t.status }}</td>
                 <td>
-                    <form action="/update/{{ loop.index0 }}" method="POST">
+                    <form action="/update/{{ i }}" method="POST" style="display:inline">
                         <select name="status" aria-label="Alterar status">
-                            <option value="Pendente">Pendente</option>
-                            <option value="Iniciado">Iniciado</option>
-                            <option value="Completo">Completo</option>
+                            <option value="Pendente" {% if t.status == "Pendente" %}selected{% endif %}>Pendente</option>
+                            <option value="Iniciado" {% if t.status == "Iniciado" %}selected{% endif %}>Iniciado</option>
+                            <option value="Completo" {% if t.status == "Completo" %}selected{% endif %}>Completo</option>
                         </select>
                         <button type="submit">Ok</button>
                     </form>
-                    <a href="/delete/{{ loop.index0 }}" aria-label="Excluir tarefa">Excluir</a>
+                    <a href="/delete/{{ i }}" aria-label="Excluir tarefa" style="color:#d9534f; margin-left: 8px;">Excluir</a>
                 </td>
             </tr>
+            {% else %}
+            <tr><td colspan="2">Nenhuma tarefa pendente.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Iniciadas</h2>
+    <table>
+        <thead><tr><th>Atividade</th><th>Ações</th></tr></thead>
+        <tbody>
+            {% for i, t in iniciadas %}
+            <tr>
+                <td>{{ t.atividade }}</td>
+                <td>
+                    <form action="/update/{{ i }}" method="POST" style="display:inline">
+                        <select name="status" aria-label="Alterar status">
+                            <option value="Pendente" {% if t.status == "Pendente" %}selected{% endif %}>Pendente</option>
+                            <option value="Iniciado" {% if t.status == "Iniciado" %}selected{% endif %}>Iniciado</option>
+                            <option value="Completo" {% if t.status == "Completo" %}selected{% endif %}>Completo</option>
+                        </select>
+                        <button type="submit">Ok</button>
+                    </form>
+                    <a href="/delete/{{ i }}" aria-label="Excluir tarefa" style="color:#d9534f; margin-left: 8px;">Excluir</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2">Nenhuma tarefa iniciada.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Completas</h2>
+    <table>
+        <thead><tr><th>Atividade</th><th>Ações</th></tr></thead>
+        <tbody>
+            {% for i, t in completas %}
+            <tr>
+                <td>{{ t.atividade }}</td>
+                <td>
+                    <form action="/update/{{ i }}" method="POST" style="display:inline">
+                        <select name="status" aria-label="Alterar status">
+                            <option value="Pendente" {% if t.status == "Pendente" %}selected{% endif %}>Pendente</option>
+                            <option value="Iniciado" {% if t.status == "Iniciado" %}selected{% endif %}>Iniciado</option>
+                            <option value="Completo" {% if t.status == "Completo" %}selected{% endif %}>Completo</option>
+                        </select>
+                        <button type="submit">Ok</button>
+                    </form>
+                    <a href="/delete/{{ i }}" aria-label="Excluir tarefa" style="color:#d9534f; margin-left: 8px;">Excluir</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2">Nenhuma tarefa completa.</td></tr>
             {% endfor %}
         </tbody>
     </table>
