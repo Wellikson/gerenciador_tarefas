@@ -6,7 +6,7 @@ tarefas = []
 
 @app.route("/")
 def index():
-    return render_template("index.html", tarefas=tarefas)
+    return render_template("index.html", tarefas=list(enumerate(tarefas)))
 
 @app.route("/add", methods=["POST"])
 def add():
