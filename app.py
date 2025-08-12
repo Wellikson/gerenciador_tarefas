@@ -6,7 +6,18 @@ tarefas = []
 
 @app.route("/")
 def index():
-    return render_template("index.html", tarefas=list(enumerate(tarefas)))
+    pendentes = []
+    iniciadas = []
+    completas = []
+    for i, t in enumerate(tarefas):
+        if t["status"] == "Pendente":
+            pendentes.append((i, t))
+        elif t["status"] == "Iniciado":
+            iniciadas.append((i, t))
+        elif t["status"] == "Completo":
+            completas.append((i, t))
+
+    return render_template("index.html", pendentes=pendentes, iniciadas=iniciadas, completas=completas)
 
 @app.route("/add", methods=["POST"])
 def add():
