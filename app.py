@@ -1,22 +1,22 @@
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 
-@app.before_first_request
-def cria_tabelas():
-    db.create_all()
-
-app = Flask(__name__)
+app = Flask(__name__)  # Crie o app primeiro
 app.secret_key = "chave-secreta-para-sessao"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tarefas.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-db = SQLAlchemy(app)
+db = SQLAlchemy(app)  # Inicialize o banco depois do app
+
+# Criar tabelas antes da primeira requisição
+@app.before_first_request
+def cria_tabelas():
+    db.create_all()
 
 # Modelos
 class Usuario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(80), unique=True, nullable=False)
-    # poderia ter senha aqui para autenticação real (não implementado nesse exemplo)
 
 class Tarefa(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -25,7 +25,8 @@ class Tarefa(db.Model):
     usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
     usuario = db.relationship("Usuario", backref=db.backref("tarefas", lazy=True))
 
-# Rota para simular login simples (apenas para identificar usuário na sessão)
+# Rotas...
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -47,20 +48,17 @@ def login():
         </form>
     '''
 
-# Rota logout
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/login")
 
-# Página principal com tarefas do usuário logado
 @app.route("/")
 def index():
     if "usuario_id" not in session:
         return redirect("/login")
 
     usuario_id = session["usuario_id"]
-
     pendentes = Tarefa.query.filter_by(usuario_id=usuario_id, status="Pendente").all()
     iniciadas = Tarefa.query.filter_by(usuario_id=usuario_id, status="Iniciado").all()
     completas = Tarefa.query.filter_by(usuario_id=usuario_id, status="Completo").all()
@@ -114,6 +112,4 @@ def delete(id):
     return redirect("/")
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
